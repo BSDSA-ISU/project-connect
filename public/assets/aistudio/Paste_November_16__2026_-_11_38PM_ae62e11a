@@ -1,0 +1,2762 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Server,
+  Wifi,
+  Calendar,
+  LayoutDashboard,
+  Download,
+  HardDrive,
+  Activity,
+  Users,
+  CheckCircle2,
+  AlertTriangle,
+  Radio,
+  Plus,
+  Terminal,
+  Database,
+  Search,
+  Filter,
+  ArrowUpRight,
+  Clock,
+  ShieldCheck,
+  FileText,
+  Zap,
+  MapPin,
+  RefreshCw,
+  ChevronRight,
+  Layers,
+  Code2,
+  Cpu,
+  FolderGit2,
+  Sparkles,
+  Sun,
+  Moon,
+  Upload,
+  Check,
+  X,
+  Eye,
+  Trash2,
+  BarChart3,
+  Signal,
+  SignalHigh,
+  SignalLow,
+  SignalZero,
+  Router,
+  Monitor,
+  Coffee
+} from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
+
+// ==========================================
+// INITIAL DATASETS & PROJECT ACTION PLAN DATA
+// ==========================================
+
+const TEAM_MEMBERS = [
+  {
+    name: 'Hays Marayag',
+    role: 'Project Lead & Network Systems Architect',
+    badge: 'Lead / Intranet',
+    avatar: 'HM',
+    color: 'from-cyan-500 to-blue-600',
+    focus: 'Ubuntu Local Mirror & LAN Routing'
+  },
+  {
+    name: 'Nelo Cabab',
+    role: 'Infrastructure & Telemetry Engineer',
+    badge: 'Wi-Fi Mapping',
+    avatar: 'NC',
+    color: 'from-emerald-500 to-teal-600',
+    focus: 'RF Signal Auditing & AP Optimization'
+  },
+  {
+    name: 'CJay Sebastian',
+    role: 'Database & Full-Stack Developer',
+    badge: 'SQL & Booking',
+    avatar: 'CS',
+    color: 'from-indigo-500 to-purple-600',
+    focus: 'MySQL Schema & Space Reservation Engine'
+  },
+  {
+    name: 'Cyrus Troy Bazar',
+    role: 'Systems Integration & DevOps Lead',
+    badge: 'Mirror & Repo',
+    avatar: 'CB',
+    color: 'from-amber-500 to-orange-600',
+    focus: 'Local Package Caching & IDE Images'
+  },
+  {
+    name: 'Catlyn Talbo',
+    role: 'UX Operations & Admin Advocacy Lead',
+    badge: 'Space & Policy',
+    avatar: 'CT',
+    color: 'from-rose-500 to-pink-600',
+    focus: 'Room Repurposing & Survey Telemetry'
+  }
+];
+
+const IMPLEMENTATION_PHASES = [
+  {
+    id: 1,
+    week: 'Week 1',
+    title: 'Phase 1: Assessment & Data Gathering',
+    status: 'Completed',
+    progress: 100,
+    summary: 'Empirical baseline of Wi-Fi dead zones, student bottlenecks, and unused department rooms.',
+    deliverables: [
+      { text: 'Deploy 5-minute student & faculty survey on connectivity pain points (n=142 responses)', done: true },
+      { text: 'Conduct 3-day peak-hour Wi-Fi speed & packet-loss audit across all IT rooms', done: true },
+      { text: 'Inventory underutilized storage annexes and vacant lecture rooms for collab zones', done: true }
+    ],
+    metricImpact: 'Identified 3 critical RF dead zones & 12.4 Mbps average ISP bottleneck during lab peaks.'
+  },
+  {
+    id: 2,
+    week: 'Weeks 2–3',
+    title: 'Phase 2: Technical Development',
+    status: 'Completed',
+    progress: 100,
+    summary: 'Building the student-led booking engine, Local Mirror prototype, and Wi-Fi floor heatmap.',
+    deliverables: [
+      { text: 'Build PHP/JS + MySQL lightweight reservation platform for lab & table booking', done: true },
+      { text: 'Configure recycled lab PC with Ubuntu 24.04 LTS Server as Local Mirror (192.168.10.200)', done: true },
+      { text: 'Compile empirical Wi-Fi Dead-Zone Map with crowdsourced speed logs', done: true }
+    ],
+    metricImpact: 'Zero-budget prototype achieved 94 MB/s local transfer speed over existing department LAN.'
+  },
+  {
+    id: 3,
+    week: 'Week 4',
+    title: 'Phase 3: Administrative Proposal & Approval',
+    status: 'Active',
+    progress: 85,
+    summary: 'Presenting empirical findings and zero-cost software prototypes to the IT Department Head.',
+    deliverables: [
+      { text: 'Present Wi-Fi Heatmap & router repositioning simulation to IT Department Head', done: true },
+      { text: 'Demo live Local Mirror & SQL Booking prototype for faculty endorsement', done: true },
+      { text: 'Secure formal sign-off to repurpose Old Storage Annex into Collab Zone A', done: false }
+    ],
+    metricImpact: 'Admin review scheduled; 2 existing access points approved for central corridor relocation.'
+  },
+  {
+    id: 4,
+    week: 'Weeks 5–7',
+    title: 'Phase 4: Deployment & Space Setup',
+    status: 'Upcoming',
+    progress: 40,
+    summary: 'Physical setup of collaboration zones, QR check-in markers, and intranet launch.',
+    deliverables: [
+      { text: 'Arrange modular tables, power strips, and mobile whiteboards in Collab Zone A', done: true },
+      { text: 'Mount table QR codes linked to the SQL Booking Hub for instant student check-in', done: false },
+      { text: 'Publish daily automated sync scripts for Kaggle datasets, VS Code, and Android Studio', done: false }
+    ],
+    metricImpact: 'Adds 28 dedicated collaborative seats and eliminates hallway floor coding.'
+  },
+  {
+    id: 5,
+    week: 'Week 8+',
+    title: 'Phase 5: Monitoring & Evaluation',
+    status: 'Scheduled',
+    progress: 15,
+    summary: 'Continuous telemetry tracking, bandwidth savings audit, and semester-end review.',
+    deliverables: [
+      { text: 'Monitor weekly LAN bandwidth offloaded vs external ISP saturation', done: false },
+      { text: 'Audit room reservation turnover and enforce 15-min no-show auto-release', done: false },
+      { text: 'Publish Post-Implementation Impact Report for campus-wide scaling', done: false }
+    ],
+    metricImpact: 'Target: >65% reduction in external ISP congestion during programming lab hours.'
+  }
+];
+
+const INITIAL_PACKAGES = [
+  {
+    id: 'pkg-1',
+    name: 'Android Studio Ladybug + SDK Bundle (Offline)',
+    category: 'IDE & Toolchains',
+    version: '2024.2.1 Patch 2',
+    sizeGB: 4.8,
+    sizeLabel: '4.80 GB',
+    downloads: 184,
+    sha256: '8f4b2e9c...a91d',
+    description: 'Complete IDE with pre-cached Android 14/15 system images & Gradle offline cache.',
+    ispTime: '54 mins (Often Fails)',
+    lanTime: '48 secs (98 MB/s)'
+  },
+  {
+    id: 'pkg-2',
+    name: 'Kaggle Capstone Dataset Pack: PH Climate & Agri-Tech CSVs',
+    category: 'Datasets',
+    version: '2026.11-RevB',
+    sizeGB: 3.2,
+    sizeLabel: '3.20 GB',
+    downloads: 142,
+    sha256: '3c91e7a1...440b',
+    description: 'Curated clean parquet & CSV datasets for Data Science, ML, and Capstone analytics.',
+    ispTime: '36 mins',
+    lanTime: '32 secs (100 MB/s)'
+  },
+  {
+    id: 'pkg-3',
+    name: 'VS Code Universal + IT Dept Extension Pack (Python/C++/React)',
+    category: 'IDE & Toolchains',
+    version: '1.95.3 LTS',
+    sizeGB: 0.65,
+    sizeLabel: '650 MB',
+    downloads: 319,
+    sha256: '9a02f4b1...77e2',
+    description: 'Includes offline `.vsix` extensions for ESLint, Prettier, Pylance, C/C++, and MySQL.',
+    ispTime: '7.5 mins',
+    lanTime: '6.5 secs (104 MB/s)'
+  },
+  {
+    id: 'pkg-4',
+    name: 'Ubuntu 24.04.1 LTS Desktop & Server ISO Images',
+    category: 'OS & Containers',
+    version: '24.04.1 Noble',
+    sizeGB: 5.4,
+    sizeLabel: '5.40 GB',
+    downloads: 97,
+    sha256: '1d77c83e...90f1',
+    description: 'Official bootable ISO + local apt-mirror configuration script for Networking Labs.',
+    ispTime: '62 mins',
+    lanTime: '54 secs (100 MB/s)'
+  },
+  {
+    id: 'pkg-5',
+    name: 'XAMPP + MySQL Workbench + Docker Base Images Bundle',
+    category: 'OS & Containers',
+    version: '8.2.12 / 8.0',
+    sizeGB: 2.1,
+    sizeLabel: '2.10 GB',
+    downloads: 228,
+    sha256: '6e19b30d...52c8',
+    description: 'Pre-configured relational database stack for Web Dev and Database Management courses.',
+    ispTime: '24 mins',
+    lanTime: '21 secs (102 MB/s)'
+  },
+  {
+    id: 'pkg-6',
+    name: 'PyCharm Community + Local Anaconda Scientific Wheels',
+    category: 'IDE & Toolchains',
+    version: '2024.3',
+    sizeGB: 3.9,
+    sizeLabel: '3.90 GB',
+    downloads: 156,
+    sha256: '4b82d11a...63a0',
+    description: 'Includes NumPy, Pandas, Scikit-Learn, TensorFlow CPU, and Matplotlib local wheel cache.',
+    ispTime: '45 mins',
+    lanTime: '39 secs (100 MB/s)'
+  }
+];
+
+const INITIAL_ROOMS = [
+  {
+    id: 'room-lab101',
+    name: 'IT Lab 101 (Main Programming)',
+    code: 'LAB-101',
+    floor: '1st Floor - West Wing',
+    gridArea: 'col-span-4 row-span-2',
+    baseSignal: -54, // dBm
+    baseSpeed: 42.5, // Mbps
+    baseLoss: 1.2, // %
+    usersConnected: 34,
+    apInstalled: true,
+    apName: 'AP-WEST-01 (Cisco Meraki)',
+    issueNote: 'Stable signal, but external ISP chokes when 30+ students download packages simultaneously.',
+    boostedBySim: 'sim-ap-1'
+  },
+  {
+    id: 'room-lab102',
+    name: 'IT Lab 102 (Networking & Hardware)',
+    code: 'LAB-102',
+    floor: '1st Floor - Center',
+    gridArea: 'col-span-4 row-span-2',
+    baseSignal: -76,
+    baseSpeed: 8.4,
+    baseLoss: 14.5,
+    usersConnected: 29,
+    apInstalled: false,
+    apName: 'Relies on distant hallway AP',
+    issueNote: 'Concrete load-bearing wall blocks signal from West Wing. Frequent SSH/Git timeouts.',
+    boostedBySim: 'sim-ap-1'
+  },
+  {
+    id: 'room-server',
+    name: 'Local Mirror Server Core',
+    code: 'SRV-200',
+    floor: '1st Floor - Core',
+    gridArea: 'col-span-4 row-span-1',
+    baseSignal: -42,
+    baseSpeed: 940.0,
+    baseLoss: 0.0,
+    usersConnected: 8,
+    apInstalled: true,
+    apName: 'Gigabit Core Switch + AP-CORE',
+    issueNote: 'Houses 192.168.10.200 Ubuntu Local Mirror Server with 1 Gbps LAN backbone.',
+    boostedBySim: null
+  },
+  {
+    id: 'room-hallway',
+    name: 'Central Corridor & Benches',
+    code: 'HAL-01',
+    floor: '1st Floor - Spine',
+    gridArea: 'col-span-4 row-span-1',
+    baseSignal: -68,
+    baseSpeed: 15.2,
+    baseLoss: 6.8,
+    usersConnected: 22,
+    apInstalled: false,
+    apName: 'High interference zone',
+    issueNote: 'Overcrowded with students sitting on the floor trying to catch spillover Wi-Fi.',
+    boostedBySim: 'sim-ap-1'
+  },
+  {
+    id: 'room-annex',
+    name: 'Collab Zone A (Repurposed Annex)',
+    code: 'CLB-A',
+    floor: '1st Floor - East Wing',
+    gridArea: 'col-span-5 row-span-2',
+    baseSignal: -86,
+    baseSpeed: 2.1,
+    baseLoss: 34.0,
+    usersConnected: 18,
+    apInstalled: false,
+    apName: 'CRITICAL DEAD ZONE',
+    issueNote: 'Severe Wi-Fi dead zone (-86 dBm). Prime space for group work once East Wing AP is added.',
+    boostedBySim: 'sim-ap-2'
+  },
+  {
+    id: 'room-lec204',
+    name: 'Lecture Room 204 & Capstone Pods',
+    code: 'LEC-204',
+    floor: '1st Floor - South-East',
+    gridArea: 'col-span-4 row-span-2',
+    baseSignal: -82,
+    baseSpeed: 4.3,
+    baseLoss: 24.5,
+    usersConnected: 26,
+    apInstalled: false,
+    apName: 'CRITICAL DEAD ZONE',
+    issueNote: 'Students cannot demo web apps or query cloud APIs during capstone consultations.',
+    boostedBySim: 'sim-ap-2'
+  },
+  {
+    id: 'room-faculty',
+    name: 'Faculty Consultation & Huddle Hub',
+    code: 'FAC-105',
+    floor: '1st Floor - South',
+    gridArea: 'col-span-3 row-span-2',
+    baseSignal: -62,
+    baseSpeed: 24.0,
+    baseLoss: 3.1,
+    usersConnected: 11,
+    apInstalled: true,
+    apName: 'AP-SOUTH-02',
+    issueNote: 'Moderate signal; router placement behind metal filing cabinets reduces East reach.',
+    boostedBySim: 'sim-ap-2'
+  }
+];
+
+const INITIAL_SPACES = [
+  {
+    id: 'SPC-01',
+    name: 'Collab Table Alpha (Whiteboard + 6-Port Power)',
+    zone: 'Collab Zone A (Repurposed Annex)',
+    type: 'Collaboration Table',
+    capacity: 6,
+    features: ['Mobile Whiteboard', 'Gigabit LAN Drop', 'Surge Tower'],
+    slots: {
+      '08:00 - 10:00': { bookedBy: 'Hays Marayag & Group 2', purpose: 'Intranet Mirror Sync Testing', size: 5, studentId: '23-10492' },
+      '10:00 - 12:00': null,
+      '13:00 - 15:00': { bookedBy: 'Catlyn Talbo & UX Team', purpose: 'Survey Telemetry Review', size: 4, studentId: '23-10881' },
+      '15:00 - 17:00': null
+    }
+  },
+  {
+    id: 'SPC-02',
+    name: 'Collab Table Beta (Dual Monitor Dock)',
+    zone: 'Collab Zone A (Repurposed Annex)',
+    type: 'Collaboration Table',
+    capacity: 6,
+    features: ['HDMI Split Monitor', 'Local Mirror Fast-Link', 'Power Strip'],
+    slots: {
+      '08:00 - 10:00': null,
+      '10:00 - 12:00': { bookedBy: 'CJay Sebastian & DB Squad', purpose: 'SQL Booking Schema Optimization', size: 4, studentId: '23-10219' },
+      '13:00 - 15:00': null,
+      '15:00 - 17:00': null
+    }
+  },
+  {
+    id: 'SPC-03',
+    name: 'Capstone Sprint Pod 1 (Sound-Dampened Corner)',
+    zone: 'Lecture Room 204 Rear',
+    type: 'Capstone Pod',
+    capacity: 5,
+    features: ['Glass Board', 'LAN Switch Port', '6x AC Outlets'],
+    slots: {
+      '08:00 - 10:00': { bookedBy: 'Cyrus Troy Bazar & DevOps Team', purpose: 'Docker Container Packaging', size: 5, studentId: '23-10554' },
+      '10:00 - 12:00': { bookedBy: 'BSIT 3A - Group 7', purpose: 'Capstone Defense Dry-Run', size: 5, studentId: '22-09412' },
+      '13:00 - 15:00': null,
+      '15:00 - 17:00': null
+    }
+  },
+  {
+    id: 'SPC-04',
+    name: 'Capstone Sprint Pod 2 (Agile Standup Bay)',
+    zone: 'Lecture Room 204 Rear',
+    type: 'Capstone Pod',
+    capacity: 5,
+    features: ['Kanban Pinboard', 'Ubuntu Mirror Direct LAN', 'Power Hub'],
+    slots: {
+      '08:00 - 10:00': null,
+      '10:00 - 12:00': null,
+      '13:00 - 15:00': { bookedBy: 'Nelo Cabab & NetSec Group', purpose: 'Packet Loss Analysis & RF Mapping', size: 4, studentId: '23-10337' },
+      '15:00 - 17:00': null
+    }
+  },
+  {
+    id: 'SPC-05',
+    name: 'IT Lab 101 - Open Workstation Cluster A (PCs 01–04)',
+    zone: 'IT Lab 101 (Vacant Class Hours)',
+    type: 'Lab Workstation Cluster',
+    capacity: 4,
+    features: ['4x Core i7 Rigs', '1 Gbps Local Mirror Mounted', 'Dual Boot Ubuntu/Win'],
+    slots: {
+      '08:00 - 10:00': { bookedBy: 'Scheduled Class: CS-201', purpose: 'Data Structures Lab Session', size: 4, studentId: 'FACULTY' },
+      '10:00 - 12:00': null,
+      '13:00 - 15:00': null,
+      '15:00 - 17:00': { bookedBy: 'BSIT 2B - ML Study Group', purpose: 'Kaggle Dataset Model Training', size: 4, studentId: '24-11902' }
+    }
+  },
+  {
+    id: 'SPC-06',
+    name: 'Huddle Bench Delta (Quick Peer Debugging)',
+    zone: 'Faculty Consultation Annex',
+    type: 'Huddle Station',
+    capacity: 4,
+    features: ['Fast Charging Bar', 'Strong Wi-Fi Zone', 'Whiteboard Easel'],
+    slots: {
+      '08:00 - 10:00': null,
+      '10:00 - 12:00': null,
+      '13:00 - 15:00': null,
+      '15:00 - 17:00': null
+    }
+  }
+];
+
+const BANDWIDTH_CHART_DATA = [
+  { time: '08:00', ispTraffic: 14, localMirror: 48 },
+  { time: '09:30', ispTraffic: 18, localMirror: 112 },
+  { time: '11:00', ispTraffic: 15, localMirror: 165 },
+  { time: '13:00', ispTraffic: 19, localMirror: 94 },
+  { time: '14:30', ispTraffic: 16, localMirror: 210 },
+  { time: '16:00', ispTraffic: 12, localMirror: 178 },
+  { time: '17:30', ispTraffic: 9, localMirror: 85 }
+];
+
+const TIME_SLOTS = ['08:00 - 10:00', '10:00 - 12:00', '13:00 - 15:00', '15:00 - 17:00'];
+
+export default function App() {
+  // Navigation & Theme State
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [darkMode, setDarkMode] = useState(true);
+
+  // Global KPI & Activity Feed State
+  const [totalBandwidthSavedGB, setTotalBandwidthSavedGB] = useState(1482.4);
+  const [activityLogs, setActivityLogs] = useState([
+    { id: 1, time: 'Just now', module: 'Mirror', text: 'BSIT-3A synced Android Studio SDK (4.8 GB) at 98 MB/s via Local Mirror.', type: 'success' },
+    { id: 2, time: '6m ago', module: 'Booking', text: 'CJay Sebastian reserved Collab Table Beta (10:00 - 12:00).', type: 'info' },
+    { id: 3, time: '14m ago', module: 'Wi-Fi', text: 'Nelo Cabab logged -86 dBm dead zone in Collab Zone A (East Wing).', type: 'warning' },
+    { id: 4, time: '28m ago', module: 'Mirror', text: 'Cyrus Troy Bazar updated Kaggle Agri-Tech Dataset Pack v2026.11.', type: 'success' }
+  ]);
+
+  // Phase Roadmap Interactive State
+  const [phases, setPhases] = useState(IMPLEMENTATION_PHASES);
+  const [selectedPhaseId, setSelectedPhaseId] = useState(3);
+
+  // Module 1: Local Mirror State
+  const [packages, setPackages] = useState(INITIAL_PACKAGES);
+  const [pkgSearch, setPkgSearch] = useState('');
+  const [pkgCategory, setPkgCategory] = useState('All');
+  const [activeDownload, setActiveDownload] = useState(null); // { pkg, progress, speed, mode: 'LAN' | 'ISP' }
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [newPkgForm, setNewPkgForm] = useState({
+    name: '',
+    category: 'Datasets',
+    version: '1.0.0',
+    sizeGB: '1.5',
+    description: ''
+  });
+
+  // Module 2: Wi-Fi Heatmap & Simulator State
+  const [rooms, setRooms] = useState(INITIAL_ROOMS);
+  const [selectedRoomId, setSelectedRoomId] = useState('room-annex');
+  const [heatmapMetric, setHeatmapMetric] = useState('signal'); // 'signal' | 'speed' | 'loss'
+  const [simAp1Active, setSimAp1Active] = useState(false); // Central Corridor Repositioned AP
+  const [simAp2Active, setSimAp2Active] = useState(false); // East Wing New Mesh Repeater
+  const [telemetryForm, setTelemetryForm] = useState({
+    roomId: 'room-annex',
+    reporter: 'Nelo Cabab',
+    measuredSpeed: '3.2',
+    measuredSignal: '-84',
+    dropouts: '4'
+  });
+  const [telemetryHistory, setTelemetryHistory] = useState([
+    { id: 101, room: 'CLB-A', reporter: 'Nelo Cabab', signal: -86, speed: 2.1, loss: 34.0, time: '10:15 AM' },
+    { id: 102, room: 'LEC-204', reporter: 'Catlyn Talbo', signal: -82, speed: 4.3, loss: 24.5, time: '09:50 AM' },
+    { id: 103, room: 'LAB-102', reporter: 'Hays Marayag', signal: -76, speed: 8.4, loss: 14.5, time: '09:20 AM' },
+    { id: 104, room: 'LAB-101', reporter: 'Cyrus Troy Bazar', signal: -54, speed: 42.5, loss: 1.2, time: '08:45 AM' }
+  ]);
+  const [showAdvocacyModal, setShowAdvocacyModal] = useState(false);
+
+  // Module 3: Space Allocation & SQL Booking State
+  const [spaces, setSpaces] = useState(INITIAL_SPACES);
+  const [selectedSlotFilter, setSelectedSlotFilter] = useState('10:00 - 12:00');
+  const [spaceTypeFilter, setSpaceTypeFilter] = useState('All');
+  const [bookingModalSpace, setBookingModalSpace] = useState(null);
+  const [bookingForm, setBookingForm] = useState({
+    studentName: 'Hays Marayag & Capstone Team',
+    studentId: '23-10492',
+    purpose: 'Full-Stack Sprint & Dataset Sync',
+    size: 4
+  });
+  const [showSqlInspector, setShowSqlInspector] = useState(true);
+  const [sqlQueries, setSqlQueries] = useState([
+    {
+      id: 'sql-1',
+      timestamp: '10:32:14',
+      type: 'SELECT',
+      query: `SELECT s.space_id, s.space_name, s.capacity, r.booked_by, r.time_slot \nFROM department_spaces s \nLEFT JOIN reservations r ON s.space_id = r.space_id AND r.date = CURRENT_DATE \nWHERE r.status = 'ACTIVE';`,
+      rowsAffected: '6 rows returned (1.8ms)'
+    },
+    {
+      id: 'sql-2',
+      timestamp: '10:18:05',
+      type: 'INSERT',
+      query: `INSERT INTO reservations (space_id, student_id, booked_by, time_slot, purpose, group_size, created_at) \nVALUES ('SPC-02', '23-10219', 'CJay Sebastian & DB Squad', '10:00 - 12:00', 'SQL Booking Schema Optimization', 4, NOW());`,
+      rowsAffected: '1 row inserted (2.4ms)'
+    }
+  ]);
+
+  // Helper to push a new activity log
+  const addActivity = (module, text, type = 'info') => {
+    setActivityLogs((prev) => [
+      { id: Date.now(), time: 'Just now', module, text, type },
+      ...prev.slice(0, 9)
+    ]);
+  };
+
+  // ==========================================
+  // COMPUTED METRICS & SIMULATIONS
+  // ==========================================
+
+  // Compute effective room Wi-Fi stats based on whether Router Placement Simulator checkboxes are active
+  const effectiveRooms = useMemo(() => {
+    return rooms.map((room) => {
+      let signal = room.baseSignal;
+      let speed = room.baseSpeed;
+      let loss = room.baseLoss;
+      let isBoosted = false;
+
+      if (room.boostedBySim === 'sim-ap-1' && simAp1Active) {
+        signal = Math.min(-46, signal + 22);
+        speed = Math.min(92, +(speed + 48.5).toFixed(1));
+        loss = Math.max(0.4, +(loss * 0.12).toFixed(1));
+        isBoosted = true;
+      }
+      if (room.boostedBySim === 'sim-ap-2' && simAp2Active) {
+        signal = Math.min(-49, signal + 34);
+        speed = Math.min(88, +(speed + 64.0).toFixed(1));
+        loss = Math.max(0.5, +(loss * 0.08).toFixed(1));
+        isBoosted = true;
+      }
+
+      // Determine status level
+      let status = 'Optimal';
+      if (signal <= -78 || speed < 6 || loss >= 18) status = 'Dead Zone';
+      else if (signal <= -67 || speed < 18 || loss >= 6) status = 'Degraded';
+
+      return { ...room, signal, speed, loss, status, isBoosted };
+    });
+  }, [rooms, simAp1Active, simAp2Active]);
+
+  const wifiSummary = useMemo(() => {
+    const deadZones = effectiveRooms.filter((r) => r.status === 'Dead Zone').length;
+    const avgSignal = Math.round(
+      effectiveRooms.reduce((acc, r) => acc + r.signal, 0) / effectiveRooms.length
+    );
+    const coverageScore = Math.min(
+      100,
+      Math.round(
+        ((effectiveRooms.length - deadZones * 1.1) / effectiveRooms.length) * 100
+      )
+    );
+    return { deadZones, avgSignal, coverageScore };
+  }, [effectiveRooms]);
+
+  const bookingSummary = useMemo(() => {
+    let totalSlots = spaces.length * TIME_SLOTS.length;
+    let bookedCount = 0;
+    let currentSlotAvailable = 0;
+
+    spaces.forEach((sp) => {
+      TIME_SLOTS.forEach((slot) => {
+        if (sp.slots[slot]) bookedCount++;
+      });
+      if (!sp.slots[selectedSlotFilter]) currentSlotAvailable++;
+    });
+
+    const utilization = Math.round((bookedCount / totalSlots) * 100);
+    return { totalSlots, bookedCount, currentSlotAvailable, utilization };
+  }, [spaces, selectedSlotFilter]);
+
+  // ==========================================
+  // INTERACTIVE HANDLERS
+  // ==========================================
+
+  // 1. Toggle checklist item in Roadmap
+  const toggleDeliverable = (phaseId, idx) => {
+    setPhases((prev) =>
+      prev.map((p) => {
+        if (p.id !== phaseId) return p;
+        const updatedDeliverables = p.deliverables.map((d, i) =>
+          i === idx ? { ...d, done: !d.done } : d
+        );
+        const doneCount = updatedDeliverables.filter((d) => d.done).length;
+        const progress = Math.round((doneCount / updatedDeliverables.length) * 100);
+        const status =
+          progress === 100 ? 'Completed' : progress > 0 ? 'Active' : 'Scheduled';
+        return { ...p, deliverables: updatedDeliverables, progress, status };
+      })
+    );
+  };
+
+  // 2. Simulate High-Speed Local Mirror Download vs Slow External ISP
+  const startSimulatedDownload = (pkg, mode = 'LAN') => {
+    if (activeDownload) return;
+    setActiveDownload({
+      pkg,
+      mode,
+      progress: 0,
+      speed: mode === 'LAN' ? 96.4 : 1.4
+    });
+  };
+
+  useEffect(() => {
+    if (!activeDownload) return;
+    const interval = setInterval(() => {
+      setActiveDownload((prev) => {
+        if (!prev) return null;
+        const step = prev.mode === 'LAN' ? 18 : 2.5;
+        const nextProgress = prev.progress + step;
+        const jitter = (Math.random() - 0.5) * (prev.mode === 'LAN' ? 8 : 0.6);
+        const nextSpeed =
+          prev.mode === 'LAN'
+            ? Math.max(84, Math.min(112, +(98 + jitter).toFixed(1)))
+            : Math.max(0.4, Math.min(2.4, +(1.3 + jitter).toFixed(1)));
+
+        if (nextProgress >= 100) {
+          clearInterval(interval);
+          // Update stats when LAN download completes
+          if (prev.mode === 'LAN') {
+            setTotalBandwidthSavedGB((b) => +(b + prev.pkg.sizeGB).toFixed(2));
+            setPackages((pkgs) =>
+              pkgs.map((p) =>
+                p.id === prev.pkg.id ? { ...p, downloads: p.downloads + 1 } : p
+              )
+            );
+            addActivity(
+              'Mirror',
+              `Downloaded "${prev.pkg.name}" (${prev.pkg.sizeLabel}) via Local Mirror at ~98 MB/s.`,
+              'success'
+            );
+          } else {
+            addActivity(
+              'Mirror',
+              `Tested External ISP download for "${prev.pkg.name}" (throttled at 1.3 MB/s).`,
+              'warning'
+            );
+          }
+          setTimeout(() => setActiveDownload(null), 900);
+          return { ...prev, progress: 100, speed: nextSpeed };
+        }
+        return { ...prev, progress: nextProgress, speed: nextSpeed };
+      });
+    }, 220);
+
+    return () => clearInterval(interval);
+  }, [activeDownload]);
+
+  // 3. Upload / Cache New Package to Local Mirror
+  const handleAddPackage = (e) => {
+    e.preventDefault();
+    if (!newPkgForm.name.trim()) return;
+    const sizeNum = parseFloat(newPkgForm.sizeGB) || 1.2;
+    const newPkg = {
+      id: `pkg-${Date.now()}`,
+      name: newPkgForm.name,
+      category: newPkgForm.category,
+      version: newPkgForm.version || '2026.1',
+      sizeGB: sizeNum,
+      sizeLabel: `${sizeNum.toFixed(2)} GB`,
+      downloads: 1,
+      sha256: `${Math.random().toString(16).substring(2, 10)}...e4f1`,
+      description:
+        newPkgForm.description ||
+        'Locally cached resource uploaded by IT Department student maintainers.',
+      ispTime: `${Math.round(sizeNum * 11)} mins`,
+      lanTime: `${Math.max(4, Math.round(sizeNum * 10))} secs (100 MB/s)`
+    };
+    setPackages((prev) => [newPkg, ...prev]);
+    setShowUploadModal(false);
+    setNewPkgForm({
+      name: '',
+      category: 'Datasets',
+      version: '1.0.0',
+      sizeGB: '1.5',
+      description: ''
+    });
+    addActivity(
+      'Mirror',
+      `Indexed new local package "${newPkg.name}" (${newPkg.sizeLabel}) on 192.168.10.200.`,
+      'success'
+    );
+  };
+
+  // 4. Submit Crowdsourced Wi-Fi Telemetry Log
+  const handleTelemetrySubmit = (e) => {
+    e.preventDefault();
+    const targetRoom = rooms.find((r) => r.id === telemetryForm.roomId);
+    if (!targetRoom) return;
+
+    const parsedSignal = Math.min(-35, Math.max(-95, parseInt(telemetryForm.measuredSignal, 10) || -75));
+    const parsedSpeed = Math.max(0.5, parseFloat(telemetryForm.measuredSpeed) || 5.0);
+    const parsedLoss = Math.min(60, Math.max(0, (parseInt(telemetryForm.dropouts, 10) || 1) * 5.5));
+
+    setRooms((prev) =>
+      prev.map((r) =>
+        r.id === telemetryForm.roomId
+          ? {
+              ...r,
+              baseSignal: parsedSignal,
+              baseSpeed: parsedSpeed,
+              baseLoss: +parsedLoss.toFixed(1)
+            }
+          : r
+      )
+    );
+
+    const newEntry = {
+      id: Date.now(),
+      room: targetRoom.code,
+      reporter: telemetryForm.reporter,
+      signal: parsedSignal,
+      speed: parsedSpeed,
+      loss: +parsedLoss.toFixed(1),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setTelemetryHistory((prev) => [newEntry, ...prev.slice(0, 7)]);
+    setSelectedRoomId(telemetryForm.roomId);
+    addActivity(
+      'Wi-Fi',
+      `${telemetryForm.reporter} logged ${parsedSignal} dBm / ${parsedSpeed} Mbps in ${targetRoom.code}.`,
+      parsedSignal <= -78 ? 'warning' : 'info'
+    );
+  };
+
+  // 5. Book or Release a Collaboration Space (with Live SQL Query generation)
+  const handleConfirmBooking = (e) => {
+    e.preventDefault();
+    if (!bookingModalSpace) return;
+    const { space, slot } = bookingModalSpace;
+
+    setSpaces((prev) =>
+      prev.map((sp) => {
+        if (sp.id !== space.id) return sp;
+        return {
+          ...sp,
+          slots: {
+            ...sp.slots,
+            [slot]: {
+              bookedBy: bookingForm.studentName,
+              studentId: bookingForm.studentId,
+              purpose: bookingForm.purpose,
+              size: Number(bookingForm.size)
+            }
+          }
+        };
+      })
+    );
+
+    const nowStr = new Date().toTimeString().split(' ')[0];
+    const insertSql = `INSERT INTO reservations (space_id, student_id, booked_by, time_slot, purpose, group_size, created_at) \nVALUES ('${space.id}', '${bookingForm.studentId}', '${bookingForm.studentName.replace(/'/g, "''")}', '${slot}', '${bookingForm.purpose.replace(/'/g, "''")}', ${bookingForm.size}, NOW());`;
+
+    setSqlQueries((prev) => [
+      {
+        id: `sql-${Date.now()}`,
+        timestamp: nowStr,
+        type: 'INSERT',
+        query: insertSql,
+        rowsAffected: '1 row inserted (1.9ms)'
+      },
+      ...prev
+    ]);
+
+    addActivity(
+      'Booking',
+      `${bookingForm.studentName} booked ${space.name} for ${slot}.`,
+      'info'
+    );
+    setBookingModalSpace(null);
+  };
+
+  const handleReleaseSlot = (space, slot) => {
+    const existing = space.slots[slot];
+    if (!existing) return;
+
+    setSpaces((prev) =>
+      prev.map((sp) => {
+        if (sp.id !== space.id) return sp;
+        return {
+          ...sp,
+          slots: {
+            ...sp.slots,
+            [slot]: null
+          }
+        };
+      })
+    );
+
+    const nowStr = new Date().toTimeString().split(' ')[0];
+    const deleteSql = `DELETE FROM reservations \nWHERE space_id = '${space.id}' AND time_slot = '${slot}' AND date = CURRENT_DATE;`;
+
+    setSqlQueries((prev) => [
+      {
+        id: `sql-${Date.now()}`,
+        timestamp: nowStr,
+        type: 'DELETE',
+        query: deleteSql,
+        rowsAffected: '1 row deleted — slot released (1.4ms)'
+      },
+      ...prev
+    ]);
+
+    addActivity(
+      'Booking',
+      `Released reservation on ${space.id} (${slot}) back to open pool.`,
+      'warning'
+    );
+  };
+
+  const selectedRoomObj =
+    effectiveRooms.find((r) => r.id === selectedRoomId) || effectiveRooms[0];
+  const selectedPhaseObj =
+    phases.find((p) => p.id === selectedPhaseId) || phases[0];
+
+  const filteredPackages = packages.filter((pkg) => {
+    const matchesCat = pkgCategory === 'All' || pkg.category === pkgCategory;
+    const matchesSearch =
+      pkg.name.toLowerCase().includes(pkgSearch.toLowerCase()) ||
+      pkg.description.toLowerCase().includes(pkgSearch.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
+
+  const filteredSpaces = spaces.filter((sp) =>
+    spaceTypeFilter === 'All' ? true : sp.type === spaceTypeFilter
+  );
+
+  return (
+    <div
+      className={`min-h-screen transition-colors duration-200 ${
+        darkMode
+          ? 'bg-slate-950 text-slate-100'
+          : 'bg-slate-50 text-slate-900'
+      }`}
+    >
+      {/* TOP COMMAND HEADER */}
+      <header
+        className={`sticky top-0 z-30 border-b backdrop-blur-md ${
+          darkMode
+            ? 'bg-slate-900/90 border-slate-800'
+            : 'bg-white/90 border-slate-200'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+            {/* Brand & Subnet Badge */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                  <Server className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-bold text-lg tracking-tight">
+                      Connect & Collaborate
+                    </h1>
+                    <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      INTRANET ONLINE
+                    </span>
+                  </div>
+                  <p
+                    className={`text-xs ${
+                      darkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}
+                  >
+                    IT Department Resource Hub • Local Mirror{' '}
+                    <code className="font-mono text-cyan-400">
+                      192.168.10.200
+                    </code>
+                  </p>
+                </div>
+              </div>
+
+              {/* Mobile Theme Toggle */}
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`md:hidden p-2 rounded-lg border ${
+                  darkMode
+                    ? 'border-slate-800 bg-slate-800/60 text-slate-300'
+                    : 'border-slate-200 bg-slate-100 text-slate-700'
+                }`}
+                title="Toggle Color Theme"
+              >
+                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {/* Navigation Pills */}
+            <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+              {[
+                {
+                  id: 'dashboard',
+                  label: 'Command Center',
+                  icon: LayoutDashboard,
+                  badge: null
+                },
+                {
+                  id: 'mirror',
+                  label: 'Local Mirror Server',
+                  icon: HardDrive,
+                  badge: '1 Gbps'
+                },
+                {
+                  id: 'wifi',
+                  label: 'Wi-Fi Dead-Zone Map',
+                  icon: Wifi,
+                  badge:
+                    wifiSummary.deadZones > 0
+                      ? `${wifiSummary.deadZones} Alerts`
+                      : 'Optimized'
+                },
+                {
+                  id: 'booking',
+                  label: 'Space & SQL Booking',
+                  icon: Calendar,
+                  badge: `${bookingSummary.currentSlotAvailable} Open`
+                }
+              ].map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                      isActive
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20'
+                        : darkMode
+                        ? 'text-slate-300 hover:bg-slate-800/80'
+                        : 'text-slate-600 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                    {item.badge && (
+                      <span
+                        className={`px-1.5 py-0.5 text-[10px] rounded-md font-semibold ${
+                          isActive
+                            ? 'bg-white/20 text-white'
+                            : item.id === 'wifi' && wifiSummary.deadZones > 0
+                            ? 'bg-rose-500/20 text-rose-400'
+                            : 'bg-cyan-500/15 text-cyan-400'
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`hidden md:flex items-center justify-center p-2 ml-1 rounded-xl border transition-colors ${
+                  darkMode
+                    ? 'border-slate-800 bg-slate-800/60 text-amber-400 hover:bg-slate-800'
+                    : 'border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+                title="Switch Dark / Light Theme"
+              >
+                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* MAIN CONTENT CONTAINER */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* GLOBAL KPI RIBBON (Always visible for real-time action feedback) */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* KPI 1 */}
+          <div
+            onClick={() => setActiveTab('mirror')}
+            className={`cursor-pointer group rounded-2xl p-4 border transition-all ${
+              darkMode
+                ? 'bg-slate-900/90 border-slate-800 hover:border-cyan-500/50'
+                : 'bg-white border-slate-200 hover:border-cyan-500 shadow-sm'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
+                External ISP Offloaded
+              </span>
+              <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+                <HardDrive className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tracking-tight">
+                {(totalBandwidthSavedGB / 1000).toFixed(3)} TB
+              </span>
+              <span className="text-xs text-emerald-400 font-medium">
+                ({totalBandwidthSavedGB.toFixed(1)} GB)
+              </span>
+            </div>
+            <p
+              className={`mt-1 text-xs ${
+                darkMode ? 'text-slate-400' : 'text-slate-500'
+              }`}
+            >
+              Served at ~98 MB/s via Ubuntu Local Mirror
+            </p>
+          </div>
+
+          {/* KPI 2 */}
+          <div
+            onClick={() => setActiveTab('wifi')}
+            className={`cursor-pointer group rounded-2xl p-4 border transition-all ${
+              darkMode
+                ? 'bg-slate-900/90 border-slate-800 hover:border-emerald-500/50'
+                : 'bg-white border-slate-200 hover:border-emerald-500 shadow-sm'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                Wi-Fi Coverage Score
+              </span>
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <Wifi className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tracking-tight">
+                {wifiSummary.coverageScore}%
+              </span>
+              <span
+                className={`text-xs font-medium ${
+                  wifiSummary.deadZones === 0
+                    ? 'text-emerald-400'
+                    : 'text-rose-400'
+                }`}
+              >
+                {wifiSummary.deadZones === 0
+                  ? '0 Dead Zones (Simulated)'
+                  : `${wifiSummary.deadZones} Critical Dead Zones`}
+              </span>
+            </div>
+            <p
+              className={`mt-1 text-xs ${
+                darkMode ? 'text-slate-400' : 'text-slate-500'
+              }`}
+            >
+              Avg Floor Signal: {wifiSummary.avgSignal} dBm across 7 zones
+            </p>
+          </div>
+
+          {/* KPI 3 */}
+          <div
+            onClick={() => setActiveTab('booking')}
+            className={`cursor-pointer group rounded-2xl p-4 border transition-all ${
+              darkMode
+                ? 'bg-slate-900/90 border-slate-800 hover:border-indigo-500/50'
+                : 'bg-white border-slate-200 hover:border-indigo-500 shadow-sm'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
+                Collab Space Utilization
+              </span>
+              <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                <Users className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tracking-tight">
+                {bookingSummary.utilization}%
+              </span>
+              <span className="text-xs text-cyan-400 font-medium">
+                {bookingSummary.bookedCount}/{bookingSummary.totalSlots} daily slots
+              </span>
+            </div>
+            <p
+              className={`mt-1 text-xs ${
+                darkMode ? 'text-slate-400' : 'text-slate-500'
+              }`}
+            >
+              Hallway floor overcrowding reduced by 78%
+            </p>
+          </div>
+
+          {/* KPI 4 */}
+          <div
+            onClick={() => setActiveTab('dashboard')}
+            className={`cursor-pointer group rounded-2xl p-4 border transition-all ${
+              darkMode
+                ? 'bg-slate-900/90 border-slate-800 hover:border-amber-500/50'
+                : 'bg-white border-slate-200 hover:border-amber-500 shadow-sm'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                Action Plan Velocity
+              </span>
+              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                <Sparkles className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tracking-tight">
+                Phase 3 / 5
+              </span>
+              <span className="text-xs text-amber-400 font-medium">
+                ₱0 Capital Cost
+              </span>
+            </div>
+            <p
+              className={`mt-1 text-xs ${
+                darkMode ? 'text-slate-400' : 'text-slate-500'
+              }`}
+            >
+              Built with repurposed IT hardware & open-source stack
+            </p>
+          </div>
+        </section>
+
+        {/* =========================================================
+            TAB 1: COMMAND CENTER DASHBOARD
+           ========================================================= */}
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            {/* Project Team Roster Card */}
+            <div
+              className={`rounded-2xl p-5 border ${
+                darkMode
+                  ? 'bg-slate-900/90 border-slate-800'
+                  : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <div>
+                  <h2 className="text-base font-bold flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-cyan-400" />
+                    Project Connect & Collaborate — Core Engineering & Operations Team
+                  </h2>
+                  <p
+                    className={`text-xs ${
+                      darkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}
+                  >
+                    Student-led initiative solving IT department bandwidth bottlenecks and collaboration space shortages.
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                  IT Department Action Plan • 5 Core Pillars
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {TEAM_MEMBERS.map((member) => (
+                  <div
+                    key={member.name}
+                    className={`p-3.5 rounded-xl border transition-all ${
+                      darkMode
+                        ? 'bg-slate-950/70 border-slate-800/90 hover:border-slate-700'
+                        : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-10 h-10 rounded-xl bg-gradient-to-br ${member.color} flex items-center justify-center text-white font-bold text-xs shadow-md`}
+                      >
+                        {member.avatar}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm truncate">
+                          {member.name}
+                        </p>
+                        <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-800 text-cyan-300">
+                          {member.badge}
+                        </span>
+                      </div>
+                    </div>
+                    <p
+                      className={`mt-2.5 text-xs font-medium ${
+                        darkMode ? 'text-slate-300' : 'text-slate-700'
+                      }`}
+                    >
+                      {member.role}
+                    </p>
+                    <p
+                      className={`mt-1 text-[11px] ${
+                        darkMode ? 'text-slate-400' : 'text-slate-500'
+                      }`}
+                    >
+                      Focus: {member.focus}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Interactive 5-Phase Implementation Roadmap + Live Bandwidth Chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left 7 Cols: 5-Phase Action Plan Explorer */}
+              <div
+                className={`lg:col-span-7 rounded-2xl p-5 border ${
+                  darkMode
+                    ? 'bg-slate-900/90 border-slate-800'
+                    : 'bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-bold text-base flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-cyan-400" />
+                      5-Phase Implementation Roadmap (Interactive Checklist)
+                    </h3>
+                    <p
+                      className={`text-xs ${
+                        darkMode ? 'text-slate-400' : 'text-slate-500'
+                      }`}
+                    >
+                      Click any phase to inspect deliverables or toggle completion milestones in real time.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Phase Selector Stepper */}
+                <div className="grid grid-cols-5 gap-2 mb-5">
+                  {phases.map((phase) => {
+                    const isSelected = phase.id === selectedPhaseId;
+                    return (
+                      <button
+                        key={phase.id}
+                        onClick={() => setSelectedPhaseId(phase.id)}
+                        className={`text-left p-2.5 rounded-xl border transition-all ${
+                          isSelected
+                            ? 'border-cyan-500 bg-cyan-500/10'
+                            : darkMode
+                            ? 'border-slate-800 bg-slate-950/60 hover:border-slate-700'
+                            : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase text-cyan-400">
+                            {phase.week}
+                          </span>
+                          <span
+                            className={`text-[10px] font-semibold ${
+                              phase.progress === 100
+                                ? 'text-emerald-400'
+                                : 'text-amber-400'
+                            }`}
+                          >
+                            {phase.progress}%
+                          </span>
+                        </div>
+                        <p className="text-xs font-semibold mt-1 truncate">
+                          Phase {phase.id}
+                        </p>
+                        <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+                          <div
+                            className={`h-full transition-all duration-300 ${
+                              phase.progress === 100
+                                ? 'bg-emerald-500'
+                                : 'bg-cyan-500'
+                            }`}
+                            style={{ width: `${phase.progress}%` }}
+                          />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Active Phase Detail Panel */}
+                <div
+                  className={`p-4 rounded-xl border ${
+                    darkMode
+                      ? 'bg-slate-950/80 border-slate-800'
+                      : 'bg-slate-50 border-slate-200'
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <h4 className="font-bold text-sm sm:text-base text-cyan-400">
+                      {selectedPhaseObj.title}
+                    </h4>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        selectedPhaseObj.progress === 100
+                          ? 'bg-emerald-500/15 text-emerald-400'
+                          : 'bg-amber-500/15 text-amber-400'
+                      }`}
+                    >
+                      {selectedPhaseObj.status} ({selectedPhaseObj.progress}%)
+                    </span>
+                  </div>
+                  <p
+                    className={`text-xs mb-4 ${
+                      darkMode ? 'text-slate-300' : 'text-slate-600'
+                    }`}
+                  >
+                    {selectedPhaseObj.summary}
+                  </p>
+
+                  <div className="space-y-2.5">
+                    {selectedPhaseObj.deliverables.map((item, idx) => (
+                      <label
+                        key={idx}
+                        onClick={() => toggleDeliverable(selectedPhaseObj.id, idx)}
+                        className={`flex items-start gap-3 p-2.5 rounded-lg border cursor-pointer transition-all ${
+                          item.done
+                            ? darkMode
+                              ? 'bg-emerald-950/20 border-emerald-500/30 text-slate-200'
+                              : 'bg-emerald-50 border-emerald-200 text-slate-800'
+                            : darkMode
+                            ? 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+                            : 'bg-white border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={item.done}
+                          onChange={() => {}}
+                          className="mt-0.5 rounded border-slate-600 text-cyan-500 focus:ring-cyan-500"
+                        />
+                        <span
+                          className={`text-xs flex-1 ${
+                            item.done ? 'line-through opacity-80' : ''
+                          }`}
+                        >
+                          {item.text}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                    <span className="text-emerald-400 font-medium">
+                      Impact: {selectedPhaseObj.metricImpact}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right 5 Cols: LAN Offload Telemetry Chart & Live Activity Feed */}
+              <div className="lg:col-span-5 space-y-6">
+                {/* Chart Card */}
+                <div
+                  className={`rounded-2xl p-5 border ${
+                    darkMode
+                      ? 'bg-slate-900/90 border-slate-800'
+                      : 'bg-white border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-bold text-sm flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-emerald-400" />
+                        LAN Local Mirror vs External ISP Traffic (GB/hr)
+                      </h3>
+                      <p
+                        className={`text-xs ${
+                          darkMode ? 'text-slate-400' : 'text-slate-500'
+                        }`}
+                      >
+                        Heavy IDE & dataset traffic stays on the 1 Gbps LAN instead of choking campus Wi-Fi.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="h-48 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={BANDWIDTH_CHART_DATA}>
+                        <defs>
+                          <linearGradient id="colorMirror" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.45} />
+                            <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                          </linearGradient>
+                          <linearGradient id="colorIsp" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                        <XAxis dataKey="time" stroke="#94a3b8" fontSize={11} />
+                        <YAxis stroke="#94a3b8" fontSize={11} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#0f172a',
+                            borderColor: '#1e293b',
+                            borderRadius: '0.75rem',
+                            fontSize: '12px',
+                            color: '#f8fafc'
+                          }}
+                        />
+                        <Legend wrapperStyle={{ fontSize: '11px' }} />
+                        <Area
+                          type="monotone"
+                          dataKey="localMirror"
+                          name="Local Mirror Intranet (GB)"
+                          stroke="#06b6d4"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorMirror)"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="ispTraffic"
+                          name="External ISP Load (GB)"
+                          stroke="#f43f5e"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorIsp)"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Live Department Telemetry Stream */}
+                <div
+                  className={`rounded-2xl p-5 border ${
+                    darkMode
+                      ? 'bg-slate-900/90 border-slate-800'
+                      : 'bg-white border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <h3 className="font-bold text-sm flex items-center gap-2 mb-3">
+                    <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
+                    Real-Time Portal Event Stream
+                  </h3>
+                  <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                    {activityLogs.map((log) => (
+                      <div
+                        key={log.id}
+                        className={`p-2.5 rounded-xl border text-xs flex items-start justify-between gap-2 ${
+                          darkMode
+                            ? 'bg-slate-950/70 border-slate-800/80'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <span
+                            className={`px-1.5 py-0.5 rounded font-semibold text-[10px] ${
+                              log.module === 'Mirror'
+                                ? 'bg-cyan-500/15 text-cyan-400'
+                                : log.module === 'Wi-Fi'
+                                ? 'bg-amber-500/15 text-amber-400'
+                                : 'bg-indigo-500/15 text-indigo-400'
+                            }`}
+                          >
+                            {log.module}
+                          </span>
+                          <span
+                            className={
+                              darkMode ? 'text-slate-300' : 'text-slate-700'
+                            }
+                          >
+                            {log.text}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 whitespace-nowrap">
+                          {log.time}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================
+            TAB 2: "LOCAL MIRROR" UBUNTU INTRANET SERVER
+           ========================================================= */}
+        {activeTab === 'mirror' && (
+          <div className="space-y-6">
+            {/* Ubuntu Server Telemetry Header Bar */}
+            <div
+              className={`rounded-2xl p-5 border ${
+                darkMode
+                  ? 'bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-950/40 border-slate-800'
+                  : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                      http://192.168.10.200/mirror
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400">
+                      Ubuntu 24.04.1 LTS (Nginx + Apt-Cacher-NG)
+                    </span>
+                  </div>
+                  <h2 className="text-lg font-bold mt-1">
+                    IT Department "Local Mirror" High-Speed Intranet Repository
+                  </h2>
+                  <p
+                    className={`text-xs ${
+                      darkMode ? 'text-slate-400' : 'text-slate-600'
+                    }`}
+                  >
+                    Repurposed Lab PC serving multi-gigabyte IDEs, datasets, and ISO containers over the local Gigabit switch—Zero external internet required.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <div
+                    className={`px-3.5 py-2 rounded-xl border text-xs ${
+                      darkMode
+                        ? 'bg-slate-950/80 border-slate-800'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <span className="text-slate-400 block">LAN Link Speed</span>
+                    <span className="font-bold text-emerald-400 text-sm">
+                      1,000 Mbps Full-Duplex
+                    </span>
+                  </div>
+                  <div
+                    className={`px-3.5 py-2 rounded-xl border text-xs ${
+                      darkMode
+                        ? 'bg-slate-950/80 border-slate-800'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <span className="text-slate-400 block">RAID Storage</span>
+                    <span className="font-bold text-cyan-400 text-sm">
+                      1.42 TB / 2.0 TB Free
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowUploadModal(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs shadow-lg shadow-cyan-500/20 hover:opacity-95 transition"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Cache New Package to Mirror
+                  </button>
+                </div>
+              </div>
+
+              {/* Active Download Simulator Banner */}
+              {activeDownload && (
+                <div className="mt-5 p-4 rounded-xl bg-slate-950 border border-cyan-500/40 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <Zap
+                        className={`w-4 h-4 ${
+                          activeDownload.mode === 'LAN'
+                            ? 'text-cyan-400 animate-bounce'
+                            : 'text-amber-400'
+                        }`}
+                      />
+                      <span className="font-bold text-white">
+                        {activeDownload.mode === 'LAN'
+                          ? 'LOCAL LAN HIGH-SPEED TRANSFER (192.168.10.200)'
+                          : 'EXTERNAL CAMPUS WI-FI ISP TRANSFER (CONGESTED)'}
+                      </span>
+                      <span className="text-slate-400">
+                        — {activeDownload.pkg.name}
+                      </span>
+                    </div>
+                    <span className="font-mono font-bold text-cyan-400">
+                      {activeDownload.speed} MB/s ({Math.round(activeDownload.progress)}%)
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-150 ${
+                        activeDownload.mode === 'LAN'
+                          ? 'bg-gradient-to-r from-cyan-400 to-emerald-400'
+                          : 'bg-amber-500'
+                      }`}
+                      style={{ width: `${activeDownload.progress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Search & Category Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={pkgSearch}
+                  onChange={(e) => setPkgSearch(e.target.value)}
+                  placeholder="Search local packages (e.g., Android Studio, Kaggle, Ubuntu, VS Code)..."
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:border-cyan-500 ${
+                    darkMode
+                      ? 'bg-slate-900 border-slate-800 text-slate-100'
+                      : 'bg-white border-slate-200 text-slate-800'
+                  }`}
+                />
+              </div>
+              <div className="flex items-center gap-1.5 overflow-x-auto">
+                {['All', 'IDE & Toolchains', 'Datasets', 'OS & Containers'].map(
+                  (cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setPkgCategory(cat)}
+                      className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+                        pkgCategory === cat
+                          ? 'bg-cyan-500 text-white'
+                          : darkMode
+                          ? 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200'
+                          : 'bg-white text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Package Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredPackages.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  className={`rounded-2xl p-5 border flex flex-col justify-between transition-all ${
+                    darkMode
+                      ? 'bg-slate-900/90 border-slate-800 hover:border-cyan-500/40'
+                      : 'bg-white border-slate-200 hover:border-cyan-500 shadow-sm'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-cyan-500/15 text-cyan-400">
+                        {pkg.category}
+                      </span>
+                      <span className="font-mono text-xs font-bold text-emerald-400">
+                        {pkg.sizeLabel}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-sm sm:text-base leading-snug">
+                      {pkg.name}
+                    </h3>
+                    <p
+                      className={`mt-1.5 text-xs ${
+                        darkMode ? 'text-slate-400' : 'text-slate-600'
+                      }`}
+                    >
+                      {pkg.description}
+                    </p>
+
+                    {/* Speed Comparison Box */}
+                    <div
+                      className={`mt-4 p-3 rounded-xl border text-xs space-y-1.5 ${
+                        darkMode
+                          ? 'bg-slate-950/70 border-slate-800'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">External Wi-Fi ISP:</span>
+                        <span className="text-rose-400 font-medium">
+                          {pkg.ispTime}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Local Mirror LAN:</span>
+                        <span className="text-emerald-400 font-bold">
+                          {pkg.lanTime}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-[11px] text-slate-500 font-mono">
+                        <span>Ver: {pkg.version}</span>
+                        <span>{pkg.downloads} pulls</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center gap-2">
+                    <button
+                      onClick={() => startSimulatedDownload(pkg, 'LAN')}
+                      disabled={!!activeDownload}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs shadow-md shadow-cyan-500/10 disabled:opacity-50"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Pull via LAN (~98 MB/s)
+                    </button>
+                    <button
+                      onClick={() => startSimulatedDownload(pkg, 'ISP')}
+                      disabled={!!activeDownload}
+                      className={`py-2 px-2.5 rounded-xl border text-xs font-medium transition ${
+                        darkMode
+                          ? 'border-slate-700 text-slate-400 hover:bg-slate-800'
+                          : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                      }`}
+                      title="Compare with congested External ISP speed"
+                    >
+                      Test ISP
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================
+            TAB 3: WI-FI DEAD-ZONE HEATMAP & ROUTER SIMULATOR
+           ========================================================= */}
+        {activeTab === 'wifi' && (
+          <div className="space-y-6">
+            {/* Top Controls & Router Placement Simulator Bar */}
+            <div
+              className={`rounded-2xl p-5 border ${
+                darkMode
+                  ? 'bg-slate-900/90 border-slate-800'
+                  : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Wifi className="w-5 h-5 text-emerald-400" />
+                    IT Department Empirical Wi-Fi Dead-Zone Floor Map
+                  </h2>
+                  <p
+                    className={`text-xs ${
+                      darkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}
+                  >
+                    Interactive floor plan telemetry gathered during peak academic hours. Toggle the proposed Access Point relocations below to simulate coverage fixes!
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {[
+                    { id: 'signal', label: 'Signal (dBm)' },
+                    { id: 'speed', label: 'Throughput (Mbps)' },
+                    { id: 'loss', label: 'Packet Loss (%)' }
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => setHeatmapMetric(m.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                        heatmapMetric === m.id
+                          ? 'bg-cyan-500 text-white'
+                          : darkMode
+                          ? 'bg-slate-950 text-slate-400 border border-slate-800'
+                          : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setShowAdvocacyModal(true)}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/25 transition"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    Export Admin Advocacy Report
+                  </button>
+                </div>
+              </div>
+
+              {/* Router Repositioning Simulator Toggles */}
+              <div
+                className={`mt-4 p-3.5 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-3 ${
+                  darkMode
+                    ? 'bg-slate-950/90 border-cyan-500/30'
+                    : 'bg-cyan-50/60 border-cyan-200'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Router className="w-5 h-5 text-cyan-400 shrink-0" />
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 block">
+                      Hardware Repositioning Simulator (Zero-Cost / Low-Cost Proposal)
+                    </span>
+                    <span
+                      className={`text-xs ${
+                        darkMode ? 'text-slate-300' : 'text-slate-600'
+                      }`}
+                    >
+                      Test how repositioning existing hallway routers eliminates dead zones in Lab 102, Collab Zone A, and Lecture 204:
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer px-3 py-2 rounded-lg bg-slate-900 text-slate-200 border border-slate-700 hover:border-cyan-400">
+                    <input
+                      type="checkbox"
+                      checked={simAp1Active}
+                      onChange={(e) => setSimAp1Active(e.target.checked)}
+                      className="rounded text-cyan-500"
+                    />
+                    <span>Relocate AP-WEST to Central Spine (+Lab 102)</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer px-3 py-2 rounded-lg bg-slate-900 text-slate-200 border border-slate-700 hover:border-emerald-400">
+                    <input
+                      type="checkbox"
+                      checked={simAp2Active}
+                      onChange={(e) => setSimAp2Active(e.target.checked)}
+                      className="rounded text-emerald-500"
+                    />
+                    <span>Deploy East-Wing Mesh Repeater (+Collab Zone A & Lec 204)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Floor Plan Grid + Room Telemetry Inspector */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left 8 Cols: Interactive 2D Floor Plan Heatmap */}
+              <div
+                className={`lg:col-span-8 rounded-2xl p-5 border ${
+                  darkMode
+                    ? 'bg-slate-900/90 border-slate-800'
+                    : 'bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    IT Department 1st Floor Blueprint — Click any zone to inspect RF metrics
+                  </span>
+                  <div className="flex items-center gap-3 text-[11px]">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> Optimal (-40 to -65 dBm)
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Degraded (-66 to -77 dBm)
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Dead Zone (&lt;-78 dBm)
+                    </span>
+                  </div>
+                </div>
+
+                {/* 12-Column Architectural Floor Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 min-h-[420px]">
+                  {effectiveRooms.map((room) => {
+                    const isSelected = room.id === selectedRoomId;
+                    let statusColors =
+                      'bg-emerald-500/15 border-emerald-500/40 text-emerald-300';
+                    let badgeBg = 'bg-emerald-500 text-slate-950';
+
+                    if (room.status === 'Dead Zone') {
+                      statusColors =
+                        'bg-rose-500/15 border-rose-500/50 text-rose-300';
+                      badgeBg = 'bg-rose-500 text-white';
+                    } else if (room.status === 'Degraded') {
+                      statusColors =
+                        'bg-amber-500/15 border-amber-500/40 text-amber-300';
+                      badgeBg = 'bg-amber-500 text-slate-950';
+                    }
+
+                    const primaryMetricLabel =
+                      heatmapMetric === 'signal'
+                        ? `${room.signal} dBm`
+                        : heatmapMetric === 'speed'
+                        ? `${room.speed} Mbps`
+                        : `${room.loss}% Loss`;
+
+                    return (
+                      <div
+                        key={room.id}
+                        onClick={() => setSelectedRoomId(room.id)}
+                        className={`${room.gridArea} cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col justify-between relative overflow-hidden ${statusColors} ${
+                          isSelected
+                            ? 'ring-2 ring-cyan-400 scale-[1.01] shadow-lg'
+                            : 'hover:opacity-95'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="text-[10px] font-mono uppercase tracking-wider opacity-80 block">
+                              {room.code} • {room.usersConnected} devices
+                            </span>
+                            <h4 className="font-bold text-sm text-white leading-tight mt-0.5">
+                              {room.name}
+                            </h4>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${badgeBg}`}
+                          >
+                            {room.isBoosted ? '⚡ BOOSTED' : room.status}
+                          </span>
+                        </div>
+
+                        <div className="my-3 flex items-baseline gap-2">
+                          <span className="text-2xl font-extrabold font-mono text-white">
+                            {primaryMetricLabel}
+                          </span>
+                          {room.isBoosted && (
+                            <span className="text-xs font-semibold text-emerald-300">
+                              (Simulated Fix)
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between text-[11px] opacity-90 pt-2 border-t border-white/10">
+                          <span className="truncate">{room.apName}</span>
+                          <span className="font-mono">
+                            {room.speed} Mbps / {room.loss}% drop
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right 4 Cols: Selected Room Detail + Crowdsourced Speed Logger */}
+              <div className="lg:col-span-4 space-y-5">
+                {/* Room Diagnostic Card */}
+                <div
+                  className={`rounded-2xl p-5 border ${
+                    darkMode
+                      ? 'bg-slate-900/90 border-slate-800'
+                      : 'bg-white border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-mono text-cyan-400">
+                      ZONE DIAGNOSTIC: {selectedRoomObj.code}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        selectedRoomObj.status === 'Optimal'
+                          ? 'bg-emerald-500/20 text-emerald-400'
+                          : selectedRoomObj.status === 'Degraded'
+                          ? 'bg-amber-500/20 text-amber-400'
+                          : 'bg-rose-500/20 text-rose-400'
+                      }`}
+                    >
+                      {selectedRoomObj.status}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-base">{selectedRoomObj.name}</h3>
+                  <p
+                    className={`text-xs mt-1 ${
+                      darkMode ? 'text-slate-400' : 'text-slate-600'
+                    }`}
+                  >
+                    {selectedRoomObj.issueNote}
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2 mt-4">
+                    <div
+                      className={`p-2.5 rounded-xl border text-center ${
+                        darkMode
+                          ? 'bg-slate-950 border-slate-800'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <span className="text-[10px] text-slate-400 block">
+                        RSSI Signal
+                      </span>
+                      <span className="font-mono font-bold text-sm">
+                        {selectedRoomObj.signal} dBm
+                      </span>
+                    </div>
+                    <div
+                      className={`p-2.5 rounded-xl border text-center ${
+                        darkMode
+                          ? 'bg-slate-950 border-slate-800'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <span className="text-[10px] text-slate-400 block">
+                        Downlink
+                      </span>
+                      <span className="font-mono font-bold text-sm text-cyan-400">
+                        {selectedRoomObj.speed} Mbps
+                      </span>
+                    </div>
+                    <div
+                      className={`p-2.5 rounded-xl border text-center ${
+                        darkMode
+                          ? 'bg-slate-950 border-slate-800'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <span className="text-[10px] text-slate-400 block">
+                        Packet Loss
+                      </span>
+                      <span className="font-mono font-bold text-sm text-rose-400">
+                        {selectedRoomObj.loss}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Student Speed-Test & Dead-Zone Logger Form */}
+                <form
+                  onSubmit={handleTelemetrySubmit}
+                  className={`rounded-2xl p-5 border space-y-3 ${
+                    darkMode
+                      ? 'bg-slate-900/90 border-slate-800'
+                      : 'bg-white border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <h4 className="font-bold text-sm flex items-center gap-2">
+                    <Signal className="w-4 h-4 text-cyan-400" />
+                    Submit Student Speed & Dropout Log
+                  </h4>
+                  <p className="text-xs text-slate-400">
+                    Crowdsourced Phase 1 & 5 survey logs update the live department heatmap immediately.
+                  </p>
+
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium">
+                      Select Department Zone
+                    </label>
+                    <select
+                      value={telemetryForm.roomId}
+                      onChange={(e) =>
+                        setTelemetryForm({ ...telemetryForm, roomId: e.target.value })
+                      }
+                      className={`w-full px-3 py-2 rounded-xl border text-xs ${
+                        darkMode
+                          ? 'bg-slate-950 border-slate-800 text-slate-100'
+                          : 'bg-slate-50 border-slate-200 text-slate-800'
+                      }`}
+                    >
+                      {rooms.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.code} — {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">
+                        Signal (dBm)
+                      </label>
+                      <input
+                        type="number"
+                        value={telemetryForm.measuredSignal}
+                        onChange={(e) =>
+                          setTelemetryForm({
+                            ...telemetryForm,
+                            measuredSignal: e.target.value
+                          })
+                        }
+                        className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-mono ${
+                          darkMode
+                            ? 'bg-slate-950 border-slate-800'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">
+                        Speed (Mbps)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={telemetryForm.measuredSpeed}
+                        onChange={(e) =>
+                          setTelemetryForm({
+                            ...telemetryForm,
+                            measuredSpeed: e.target.value
+                          })
+                        }
+                        className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-mono ${
+                          darkMode
+                            ? 'bg-slate-950 border-slate-800'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">
+                        Dropouts/hr
+                      </label>
+                      <input
+                        type="number"
+                        value={telemetryForm.dropouts}
+                        onChange={(e) =>
+                          setTelemetryForm({
+                            ...telemetryForm,
+                            dropouts: e.target.value
+                          })
+                        }
+                        className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-mono ${
+                          darkMode
+                            ? 'bg-slate-950 border-slate-800'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold text-xs shadow-md hover:opacity-95 transition"
+                  >
+                    Record Telemetry to Heatmap
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================
+            TAB 4: SMART SPACE ALLOCATION & SQL BOOKING SYSTEM
+           ========================================================= */}
+        {activeTab === 'booking' && (
+          <div className="space-y-6">
+            {/* Booking Header & Slot Filter Bar */}
+            <div
+              className={`rounded-2xl p-5 border ${
+                darkMode
+                  ? 'bg-slate-900/90 border-slate-800'
+                  : 'bg-white border-slate-200 shadow-sm'
+              }`}
+            >
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-indigo-400" />
+                    Smart Space Allocation & Repurposed Collaboration Zone Booking
+                  </h2>
+                  <p
+                    className={`text-xs ${
+                      darkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}
+                  >
+                    Student-developed SQL reservation system turning vacant classrooms and the repurposed storage annex into structured collaboration hubs.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-400 mr-1">
+                    Active Time Slot:
+                  </span>
+                  {TIME_SLOTS.map((slot) => (
+                    <button
+                      key={slot}
+                      onClick={() => setSelectedSlotFilter(slot)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                        selectedSlotFilter === slot
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                          : darkMode
+                          ? 'bg-slate-950 text-slate-400 border border-slate-800'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setShowSqlInspector(!showSqlInspector)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-semibold transition ${
+                      showSqlInspector
+                        ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40'
+                        : darkMode
+                        ? 'border-slate-800 text-slate-400'
+                        : 'border-slate-200 text-slate-600'
+                    }`}
+                  >
+                    <Database className="w-3.5 h-3.5" />
+                    {showSqlInspector ? 'Hide SQL Engine' : 'View SQL Engine'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Space Cards Grid */}
+              <div
+                className={`${
+                  showSqlInspector ? 'lg:col-span-7' : 'lg:col-span-12'
+                } space-y-4`}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredSpaces.map((space) => {
+                    const currentReservation = space.slots[selectedSlotFilter];
+                    const isAvailable = !currentReservation;
+
+                    return (
+                      <div
+                        key={space.id}
+                        className={`rounded-2xl p-5 border flex flex-col justify-between transition-all ${
+                          darkMode
+                            ? 'bg-slate-900/90 border-slate-800'
+                            : 'bg-white border-slate-200 shadow-sm'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="font-mono text-xs font-bold text-indigo-400">
+                              {space.id} • {space.type}
+                            </span>
+                            <span
+                              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                isAvailable
+                                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                  : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                              }`}
+                            >
+                              {isAvailable ? '● AVAILABLE' : '● RESERVED'}
+                            </span>
+                          </div>
+
+                          <h3 className="font-bold text-sm sm:text-base">
+                            {space.name}
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            Location: {space.zone} (Max {space.capacity} seats)
+                          </p>
+
+                          {/* Amenities */}
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {space.features.map((feat) => (
+                              <span
+                                key={feat}
+                                className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                  darkMode
+                                    ? 'bg-slate-950 text-slate-300 border border-slate-800'
+                                    : 'bg-slate-100 text-slate-700'
+                                }`}
+                              >
+                                {feat}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Current Slot Status Box */}
+                          <div
+                            className={`mt-4 p-3 rounded-xl border text-xs ${
+                              isAvailable
+                                ? darkMode
+                                  ? 'bg-emerald-950/20 border-emerald-500/30'
+                                  : 'bg-emerald-50 border-emerald-200'
+                                : darkMode
+                                ? 'bg-slate-950/90 border-slate-800'
+                                : 'bg-slate-50 border-slate-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between font-semibold mb-1">
+                              <span>Slot: {selectedSlotFilter}</span>
+                              {currentReservation && (
+                                <span className="font-mono text-[11px] text-cyan-400">
+                                  ID: {currentReservation.studentId}
+                                </span>
+                              )}
+                            </div>
+                            {isAvailable ? (
+                              <p className="text-emerald-400">
+                                Ready for instant group check-in via QR or portal.
+                              </p>
+                            ) : (
+                              <div className="space-y-0.5">
+                                <p className="font-medium text-amber-300">
+                                  Booked by: {currentReservation.bookedBy}
+                                </p>
+                                <p className="text-slate-400">
+                                  Purpose: {currentReservation.purpose} (
+                                  {currentReservation.size} members)
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="mt-4 pt-3 border-t border-slate-800/60">
+                          {isAvailable ? (
+                            <button
+                              onClick={() =>
+                                setBookingModalSpace({
+                                  space,
+                                  slot: selectedSlotFilter
+                                })
+                              }
+                              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500 text-white font-semibold text-xs shadow-md transition"
+                            >
+                              Reserve Table for {selectedSlotFilter}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() =>
+                                handleReleaseSlot(space, selectedSlotFilter)
+                              }
+                              className={`w-full py-2 rounded-xl border text-xs font-semibold transition ${
+                                darkMode
+                                  ? 'border-rose-500/40 text-rose-400 hover:bg-rose-500/10'
+                                  : 'border-rose-300 text-rose-600 hover:bg-rose-50'
+                              }`}
+                            >
+                              Check-Out / Release Slot (SQL DELETE)
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Live SQL Database Inspector Panel */}
+              {showSqlInspector && (
+                <div className="lg:col-span-5">
+                  <div className="rounded-2xl p-5 border bg-slate-950 border-slate-800 text-slate-100 sticky top-20 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Terminal className="w-4 h-4 text-cyan-400" />
+                        <h3 className="font-mono font-bold text-sm text-cyan-400">
+                          MySQL 8.0 Live Query Inspector
+                        </h3>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-400">
+                        db: it_collab_hub
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-400">
+                      Per Phase 2 of the Action Plan, this lightweight SQL database tracks student space reservations and prevents double-booking conflicts.
+                    </p>
+
+                    {/* Schema Quick Reference */}
+                    <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 font-mono text-[11px] text-slate-300 space-y-1">
+                      <div className="text-cyan-400 font-bold">
+                        TABLE `reservations` (Primary Key: `res_id`)
+                      </div>
+                      <div className="text-slate-400">
+                        • space_id VARCHAR(12) REFERENCES department_spaces(id)
+                      </div>
+                      <div className="text-slate-400">
+                        • student_id VARCHAR(16), booked_by VARCHAR(64)
+                      </div>
+                      <div className="text-slate-400">
+                        • time_slot VARCHAR(20), group_size INT, created_at TIMESTAMP
+                      </div>
+                    </div>
+
+                    {/* Executed SQL Statements Stream */}
+                    <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                      {sqlQueries.map((q) => (
+                        <div
+                          key={q.id}
+                          className="p-3 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs space-y-1.5"
+                        >
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span
+                              className={`px-1.5 py-0.5 rounded font-bold ${
+                                q.type === 'INSERT'
+                                  ? 'bg-emerald-500/20 text-emerald-400'
+                                  : q.type === 'DELETE'
+                                  ? 'bg-rose-500/20 text-rose-400'
+                                  : 'bg-cyan-500/20 text-cyan-400'
+                              }`}
+                            >
+                              {q.type}
+                            </span>
+                            <span className="text-slate-500">{q.timestamp}</span>
+                          </div>
+                          <pre className="text-[11px] text-cyan-200 whitespace-pre-wrap overflow-x-auto leading-relaxed">
+                            {q.query}
+                          </pre>
+                          <div className="text-[10px] text-emerald-400 pt-1 border-t border-slate-800">
+                            ✓ {q.rowsAffected}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* =========================================================
+          MODAL 1: UPLOAD / CACHE PACKAGE TO LOCAL MIRROR
+         ========================================================= */}
+      {showUploadModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className={`w-full max-w-md rounded-2xl p-6 border ${
+              darkMode
+                ? 'bg-slate-900 border-slate-800 text-slate-100'
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-base flex items-center gap-2">
+                <HardDrive className="w-4 h-4 text-cyan-400" />
+                Cache Academic Package on Local Mirror
+              </h3>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddPackage} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold mb-1">
+                  Package / Dataset Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Flutter 3.24 Offline SDK + Gradle Cache"
+                  value={newPkgForm.name}
+                  onChange={(e) =>
+                    setNewPkgForm({ ...newPkgForm, name: e.target.value })
+                  }
+                  className={`w-full px-3 py-2 rounded-xl border ${
+                    darkMode
+                      ? 'bg-slate-950 border-slate-800'
+                      : 'bg-slate-50 border-slate-200'
+                  }`}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold mb-1">Category</label>
+                  <select
+                    value={newPkgForm.category}
+                    onChange={(e) =>
+                      setNewPkgForm({ ...newPkgForm, category: e.target.value })
+                    }
+                    className={`w-full px-3 py-2 rounded-xl border ${
+                      darkMode
+                        ? 'bg-slate-950 border-slate-800'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <option>IDE & Toolchains</option>
+                    <option>Datasets</option>
+                    <option>OS & Containers</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Size (GB)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={newPkgForm.sizeGB}
+                    onChange={(e) =>
+                      setNewPkgForm({ ...newPkgForm, sizeGB: e.target.value })
+                    }
+                    className={`w-full px-3 py-2 rounded-xl border ${
+                      darkMode
+                        ? 'bg-slate-950 border-slate-800'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-1">
+                  Contents & Course Description
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Describe which programming or data science classes need this offline bundle..."
+                  value={newPkgForm.description}
+                  onChange={(e) =>
+                    setNewPkgForm({ ...newPkgForm, description: e.target.value })
+                  }
+                  className={`w-full px-3 py-2 rounded-xl border ${
+                    darkMode
+                      ? 'bg-slate-950 border-slate-800'
+                      : 'bg-slate-50 border-slate-200'
+                  }`}
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-700 text-slate-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-cyan-500 text-white font-semibold"
+                >
+                  Sync to 192.168.10.200
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================
+          MODAL 2: SQL SPACE RESERVATION FORM
+         ========================================================= */}
+      {bookingModalSpace && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className={`w-full max-w-md rounded-2xl p-6 border ${
+              darkMode
+                ? 'bg-slate-900 border-slate-800 text-slate-100'
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-base">
+                Reserve {bookingModalSpace.space.name}
+              </h3>
+              <button
+                onClick={() => setBookingModalSpace(null)}
+                className="p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-indigo-400 font-semibold mb-4">
+              Time Slot: {bookingModalSpace.slot} • Zone: {bookingModalSpace.space.zone}
+            </p>
+
+            <form onSubmit={handleConfirmBooking} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold mb-1">
+                  Lead Student / Group Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={bookingForm.studentName}
+                  onChange={(e) =>
+                    setBookingForm({ ...bookingForm, studentName: e.target.value })
+                  }
+                  className={`w-full px-3 py-2 rounded-xl border ${
+                    darkMode
+                      ? 'bg-slate-950 border-slate-800'
+                      : 'bg-slate-50 border-slate-200'
+                  }`}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold mb-1">Student ID</label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingForm.studentId}
+                    onChange={(e) =>
+                      setBookingForm({ ...bookingForm, studentId: e.target.value })
+                    }
+                    className={`w-full px-3 py-2 rounded-xl border font-mono ${
+                      darkMode
+                        ? 'bg-slate-950 border-slate-800'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">
+                    Group Size (Max {bookingModalSpace.space.capacity})
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max={bookingModalSpace.space.capacity}
+                    value={bookingForm.size}
+                    onChange={(e) =>
+                      setBookingForm({ ...bookingForm, size: e.target.value })
+                    }
+                    className={`w-full px-3 py-2 rounded-xl border ${
+                      darkMode
+                        ? 'bg-slate-950 border-slate-800'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-1">
+                  Academic Purpose / Sprint Goal
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={bookingForm.purpose}
+                  onChange={(e) =>
+                    setBookingForm({ ...bookingForm, purpose: e.target.value })
+                  }
+                  className={`w-full px-3 py-2 rounded-xl border ${
+                    darkMode
+                      ? 'bg-slate-950 border-slate-800'
+                      : 'bg-slate-50 border-slate-200'
+                  }`}
+                />
+              </div>
+
+              <div className="pt-3 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setBookingModalSpace(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-700 text-slate-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold"
+                >
+                  Execute SQL Reservation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================
+          MODAL 3: PHASE 3 ADMINISTRATIVE ADVOCACY BRIEF
+         ========================================================= */}
+      {showAdvocacyModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className={`w-full max-w-2xl rounded-2xl p-6 border max-h-[85vh] overflow-y-auto ${
+              darkMode
+                ? 'bg-slate-900 border-slate-700 text-slate-100'
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400">
+                  PHASE 3 DELIVERABLE • EMPIRICAL INFRASTRUCTURE BRIEF
+                </span>
+                <h3 className="font-bold text-lg">
+                  IT Department Connectivity & Space Repurposing Proposal
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAdvocacyModal(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 my-4 text-xs leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <p className="font-semibold text-cyan-400">
+                  Prepared by: Hays Marayag, Nelo Cabab, CJay Sebastian, Cyrus Troy Bazar, Catlyn Talbo
+                </p>
+                <p className="text-slate-400">
+                  Submitted to: IT Department Head & Campus Network Administration
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-emerald-400 mb-1">
+                  1. Empirical Wi-Fi Audit Findings
+                </h4>
+                <p className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
+                  Across 3 days of peak-hour testing, our team identified severe signal attenuation in the East Wing Annex (<strong>-86 dBm / 34% packet loss</strong>) and Lecture Room 204 (<strong>-82 dBm / 24.5% packet loss</strong>). Meanwhile, 74% of external ISP saturation is caused by repetitive student downloads of identical IDEs and datasets.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-cyan-400 mb-1">
+                  2. Zero-Budget Student Technical Interventions (Already Built)
+                </h4>
+                <ul className="list-disc pl-5 space-y-1 text-slate-300">
+                  <li>
+                    <strong>Local Mirror Intranet (`192.168.10.200`):</strong> Configured on a repurposed Ubuntu lab PC; currently offloading <strong>{(totalBandwidthSavedGB / 1000).toFixed(2)} TB</strong> of external bandwidth at ~98 MB/s over local LAN.
+                  </li>
+                  <li>
+                    <strong>SQL Space Booking System:</strong> Live reservation web portal managing 6 collaborative stations with automated conflict prevention.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-amber-400 mb-1">
+                  3. Requested Administrative Sign-Off
+                </h4>
+                <ul className="list-disc pl-5 space-y-1 text-slate-300">
+                  <li>Approve repositioning of `AP-WEST` 8 meters toward the Central Spine corridor.</li>
+                  <li>Authorize repurposing the East Wing Storage Annex into <strong>Collab Zone A</strong> (28 student seats with existing folding tables & whiteboards).</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+              <span className="text-[11px] text-emerald-400 font-mono">
+                ✓ Ready for Phase 3 Faculty Presentation
+              </span>
+              <button
+                onClick={() => setShowAdvocacyModal(false)}
+                className="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs"
+              >
+                Done / Close Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

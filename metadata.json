@@ -1,0 +1,6 @@
+{
+  "name": "Project Connect",
+  "description": "IT Department Resource Hub featuring an Ubuntu Local Mirror Intranet, Empirical Wi-Fi Dead-Zone Floor Map, and Smart Space SQL Booking Engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
